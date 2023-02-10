@@ -30,7 +30,7 @@ def main():
         coordinates = get_pos(map['last_clicked']['lat'],map['last_clicked']['lng'])
         forecast = get_f15(coordinates[0],coordinates[1])
         st.line_chart(forecast['temperature'], y = 'temperature')
-        temp = st.select_slider(label='Temp:',options=forecast['startTime'], format_func=lambda x: x.strftime('%A %b %d: %I%p') )
+        temp = st.select_slider(label='Check Specific Hour:',options=forecast['startTime'], format_func=lambda x: x.strftime('%A %b %d: %I%p') )
         st.write(f"forecasted temp: {forecast[forecast.startTime == temp]['temperature'].iloc[0]}")
 
 if __name__ == '__main__':
