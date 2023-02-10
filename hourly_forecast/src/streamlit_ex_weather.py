@@ -28,10 +28,12 @@ def main():
 
     if map['last_clicked'] is not None:
         coordinates = get_pos(map['last_clicked']['lat'],map['last_clicked']['lng'])
-        forecast = get_f15(coordinates[0],coordinates[1])
-        st.line_chart(forecast['temperature'], y = 'temperature')
-        temp = st.select_slider(label='Check Specific Hour:',options=forecast['startTime'], format_func=lambda x: x.strftime('%A %b %d: %I%p') )
-        st.write(f"forecasted temp: {forecast[forecast.startTime == temp]['temperature'].iloc[0]}")
-
+        try:
+            forecast = get_f15(coordinates[0],coordinates[1])
+            st.line_chart(forecast['temperature'], y = 'temperature')
+            temp = st.select_slider(label='Check Specific Hour:',options=forecast['startTime'], format_func=lambda x: x.strftime('%A %b %d: %I%p') )
+            st.write(f"forecasted temp: {forecast[forecast.startTime == temp]['temperature'].iloc[0]}")
+        except KeyError:
+            st.write('There was an error, please click the map again. Thanks')
 if __name__ == '__main__':
     main()
