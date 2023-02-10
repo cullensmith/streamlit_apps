@@ -1,0 +1,22 @@
+### Grid
+grid.color: #eeeeee
+
+### Fonts
+font.family: sans=serif
+font.size: 18
+
+### Axes
+axes.labelcolor: red
+axes.edgecolor: #b4b4b4
+axes.titlecolor: yellow
+axes.facecolor: white
+axes.spines.left:   True
+axes.spines.bottom:   True
+axes.spines.top:   False
+axes.spines.right:   False
+
+### Ticks
+xtick.labelcolor: #9b9b9b
+ytick.labelcolor: #7b7b7b
+xtick.color: #9b9b9b
+ytick.color: #9b9b9b
