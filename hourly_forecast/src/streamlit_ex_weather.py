@@ -8,26 +8,27 @@ import chart_style
 from weather import get_cell as cell, get_forecast as get_f
 
 
-def create_map(coordinates):
-    map = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
-    fg = folium.FeatureGroup(name = 'dots')
-    fg.add_child(
-        folium.CircleMarker(location=[coordinates[0],coordinates[1]],
-                            radius=2,
-                            weight=5)
-        )
-    # st_map = st_folium(map,feature_group_to_add=fg, height=450)
-    return map,fg
+# Need to retructure the main function splitting out the two below
+# def create_map(coordinates):
+#     map = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
+#     fg = folium.FeatureGroup(name = 'dots')
+#     fg.add_child(
+#         folium.CircleMarker(location=[coordinates[0],coordinates[1]],
+#                             radius=2,
+#                             weight=5)
+#         )
+#     # st_map = st_folium(map,feature_group_to_add=fg, height=450)
+#     return map,fg
 
 
-def clicked_spot(map,coordinates):
-    # amap = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
+# def clicked_spot(map,coordinates):
+#     # amap = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
 
-    fg = folium.FeatureGroup(name = 'newdots')
-    fg.add_child(folium.CircleMarker(location=[coordinates[0],coordinates[1]],
-                            radius=4,
-                            weight=5))
-    return map,fg
+#     fg = folium.FeatureGroup(name = 'newdots')
+#     fg.add_child(folium.CircleMarker(location=[coordinates[0],coordinates[1]],
+#                             radius=4,
+#                             weight=5))
+#     return map,fg
 
 def get_pos(lat,lng):
     # this function isn't entirely necessary as you can just take the coords directly, mainly included for demonstration purposes
@@ -69,6 +70,8 @@ def construct_matplotlib_chart(coordinates):
 
 def main():
     st.write("Click anywhere on the map to get it's projected hourly forecast")
+    st.write('- Currently limited to the US')
+
     if 'coordinates' not in st.session_state:
         st.session_state['coordinates'] = (40.823740, -77.862548)
 
@@ -81,7 +84,6 @@ def main():
                             radius=2,
                             weight=5)
         )
-
     st.session_state.fg.add_child(
         folium.CircleMarker(location=[map.location[0],map.location[1]],
                             radius=8,

@@ -2,7 +2,7 @@
 ## link: [Hourly Forecast](https://hourly-forecast.streamlit.app)
 
 ## Purpose
-- Show basic funcitonality of a standalone python web app that utilizes an API request to populate a customizd matplotlib chart depending on user selection
+- Show basic funcitonality of a standalone python web app that utilizes an API request to populate a customized matplotlib chart depending on user selection
 
 ## Usage
 - Click anywhere on the map
