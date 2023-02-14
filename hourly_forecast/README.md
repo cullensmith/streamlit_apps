@@ -1,5 +1,5 @@
 # Generic Web Application
-## link: [Hourly Forecast](https://hourly-forecast.streamlit.io)
+## link: [Hourly Forecast](http://hourly-forecast.streamlit.io)
 
 ## Purpose
 - Show basic funcitonality of a standalone python web app that utilizes an API request to populate a customizd matplotlib chart depending on user selection
