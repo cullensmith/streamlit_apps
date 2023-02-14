@@ -7,52 +7,112 @@ import chart_style
 
 from weather import get_cell as cell, get_forecast as get_f
 
-# def style_chart():
-#     chart_style.set_style()
-#     print('style is set')
-    
 
-def display_map():
-    map = folium.Map(location=[40.823740, -77.862548], zoom_start=12, scrollWheelZoom=False, tiles='CartoDB positron')
-    st_map = st_folium(map, width=700, height=450)
-    return st_map
+def create_map(coordinates):
+    map = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
+    fg = folium.FeatureGroup(name = 'dots')
+    fg.add_child(
+        folium.CircleMarker(location=[coordinates[0],coordinates[1]],
+                            radius=2,
+                            weight=5)
+        )
+    # st_map = st_folium(map,feature_group_to_add=fg, height=450)
+    return map,fg
+
+
+def clicked_spot(map,coordinates):
+    # amap = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
+
+    fg = folium.FeatureGroup(name = 'newdots')
+    fg.add_child(folium.CircleMarker(location=[coordinates[0],coordinates[1]],
+                            radius=4,
+                            weight=5))
+    return map,fg
 
 def get_pos(lat,lng):
+    # this function isn't entirely necessary as you can just take the coords directly, mainly included for demonstration purposes
     return lat,lng
 
 def get_f15(y,x):
+    # retrieve the grid values from the custom weather module
     the_cell = cell(y,x)
+    # using the values returned above call the function to retrieve the weather forecast data utilizing the site's api
+    # convert the incoming json to a pandas dataframe for easier manipulation later
     forecast = pd.DataFrame(get_f(the_cell))
     forecast['startTime'] = pd.to_datetime(forecast.startTime)
     forecast.index = forecast.startTime
     return forecast
 
+def construct_matplotlib_chart(coordinates):
+    try:
+
+        plt.pyplot.grid(True)
+        forecast = get_f15(coordinates[0],coordinates[1])
+
+        fig, ax = plt.pyplot.subplots()
+        chart_style.set_style(fig)
+
+        temp = st.select_slider(label='Drag the slider to target a specific time:',options=forecast['startTime'], format_func=lambda x: x.strftime('%A %b %d: %I%p') )
+        st.write(f"Forecasted Temp: {forecast[forecast.startTime == temp]['temperature'].iloc[0]}")
+
+        ax.plot(forecast['temperature'],linewidth=1.5)
+        read_temp = forecast[forecast.startTime == temp]['number'].iloc[0]
+        ax.plot(forecast['temperature'][:read_temp], linewidth=2, color='#ff7b7b', zorder=2)
+        ax.scatter(forecast[forecast.startTime == temp]['startTime'].iloc[0], forecast[forecast.startTime == temp]['temperature'].iloc[0],color='#ff6b6b', zorder=3)
+        rfdates = plt.dates.DateFormatter('%a')
+        ax.xaxis.set_major_formatter(rfdates)
+        st.pyplot(fig)
+    except KeyError as e:
+        # Sometimes the api gets hung up resuting in KeyError
+        # In those cases return an error message
+        st.write('There was an error, please click the map again. Thanks')
+
 def main():
-    st.write('Hourly Forecast')
-    
-    map = display_map()
-    
+    st.write("Click anywhere on the map to get it's projected hourly forecast")
+    if 'coordinates' not in st.session_state:
+        st.session_state['coordinates'] = (40.823740, -77.862548)
 
-    if map['last_clicked'] is not None:
-        coordinates = get_pos(map['last_clicked']['lat'],map['last_clicked']['lng'])
-        try:
-            plt.pyplot.grid(True)
-            forecast = get_f15(coordinates[0],coordinates[1])
+    map = folium.Map(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]], zoom_start=4, scrollWheelZoom=False, tiles='CartoDB positron')
+    if 'themap' not in st.session_state:
+        st.session_state.themap = st_folium(map, key='init', height=0)
+    st.session_state.fg = folium.FeatureGroup(name = 'dots')
+    st.session_state.fg.add_child(
+        folium.CircleMarker(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]],
+                            radius=2,
+                            weight=5)
+        )
 
-            fig, ax = plt.pyplot.subplots()
-            chart_style.set_style(fig)
+    st.session_state.fg.add_child(
+        folium.CircleMarker(location=[map.location[0],map.location[1]],
+                            radius=8,
+                            weight=2)
+        )
 
-            temp = st.select_slider(label='Check Specific Hour:',options=forecast['startTime'], format_func=lambda x: x.strftime('%A %b %d: %I%p') )
-            st.write(f"Forecasted Temp: {forecast[forecast.startTime == temp]['temperature'].iloc[0]}")
+    try:
+        if st.session_state.themap['last_clicked']:
+            st.session_state.fg = folium.FeatureGroup(name = 'newdots')
+            st.session_state.fg.add_child(
+                folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
+                                    radius=1.75,
+                                    weight=5)
+                )
 
-            ax.plot(forecast['temperature'],linewidth=1.5)
-            read_temp = forecast[forecast.startTime == temp]['number'].iloc[0]
-            ax.plot(forecast['temperature'][:read_temp], linewidth=2, color='#ff7b7b', zorder=2)
-            ax.scatter(forecast[forecast.startTime == temp]['startTime'].iloc[0], forecast[forecast.startTime == temp]['temperature'].iloc[0],color='#ff6b6b', zorder=3)
-            rfdates = plt.dates.DateFormatter('%a')
-            ax.xaxis.set_major_formatter(rfdates)
-            st.pyplot(fig)
-        except KeyError as e:
-            st.write('There was an error, please click the map again. Thanks')
+            st.session_state.fg.add_child(
+                folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
+                                    radius=8,
+                                    weight=2)
+                )
+    except TypeError:
+        print(st.session_state.themap['last_clicked']['lat'])
+        print('came through as None')
+    st.session_state.themap = st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=450)
+
+    st_folium(map,key='old',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=0)
+    try:
+        coords = [st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']]
+    except TypeError:
+        coords = st.session_state['coordinates']
+    construct_matplotlib_chart(coords)
+
 if __name__ == '__main__':
     main()
