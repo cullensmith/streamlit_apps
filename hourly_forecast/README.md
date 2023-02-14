@@ -1,9 +1,25 @@
-# Generic web application
+# Generic Web Application
+## link: [Hourly Forecast](https://hourly-forecast.streamlit.io)
+
 ## Purpose
-    Show basic funcitonality of a web app that utilizes an API request to populate a chart. Takes it a step further allowing the user to make a selection based upon input of a slider. Aesthetics are currently an afterthought and can be updated at a later date.
+- Show basic funcitonality of a standalone python web app that utilizes an API request to populate a customizd matplotlib chart depending on user selection
 
 ## Usage
 - Click anywhere on the map
 - Sends a request to weather.gov using their API
-- Parses the response and populates a line chart depicting the hourly forecasted temperature
+- Parses the json response, storing results in a pandas dataframe 
+- Populates a line chart depicting the hourly forecasted temperature
 - Drag the slider to select a specfic hour within the forecast
+
+## To Do
+- Aesthetics are currently an afterthought and need to be cleaned up
+- Include additional selection methods
+- Filterable precipitation window 
+
+## Main libraries
+- Python
+- Streamlit
+- Pandas
+- Requests
+- Matplotlib
+- Folium
