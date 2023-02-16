@@ -4,35 +4,17 @@ import folium
 from streamlit_folium import st_folium
 import matplotlib as plt
 import chart_style
-
+import time
 from weather import get_cell as cell, get_forecast as get_f
 
 
 # Need to retructure the main function splitting out the two below
 # def create_map(coordinates):
-#     map = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
-#     fg = folium.FeatureGroup(name = 'dots')
-#     fg.add_child(
-#         folium.CircleMarker(location=[coordinates[0],coordinates[1]],
-#                             radius=2,
-#                             weight=5)
-#         )
-#     # st_map = st_folium(map,feature_group_to_add=fg, height=450)
-#     return map,fg
-
+    # pass
 
 # def clicked_spot(map,coordinates):
-#     # amap = folium.Map(location=[coordinates[0],coordinates[1]], zoom_start=7, scrollWheelZoom=False, tiles='CartoDB positron')
-
-#     fg = folium.FeatureGroup(name = 'newdots')
-#     fg.add_child(folium.CircleMarker(location=[coordinates[0],coordinates[1]],
-#                             radius=4,
-#                             weight=5))
-#     return map,fg
-
-def get_pos(lat,lng):
-    # this function isn't entirely necessary as you can just take the coords directly, mainly included for demonstration purposes
-    return lat,lng
+    # pass
+    
 
 def get_f15(y,x):
     # retrieve the grid values from the custom weather module
@@ -44,7 +26,7 @@ def get_f15(y,x):
     forecast.index = forecast.startTime
     return forecast
 
-def construct_matplotlib_chart(coordinates):
+def construct_matplotlib_chart(coordinates, ctr):
     try:
 
         plt.pyplot.grid(True)
@@ -63,14 +45,23 @@ def construct_matplotlib_chart(coordinates):
         rfdates = plt.dates.DateFormatter('%a')
         ax.xaxis.set_major_formatter(rfdates)
         st.pyplot(fig)
+        print(f'goodcoords: {coordinates}')
     except KeyError as e:
-        # Sometimes the api gets hung up resuting in KeyError
-        # In those cases return an error message
-        st.write('There was an error, please click the map again. Thanks')
+        ctr += 1
+        if ctr < 4:
+            print(f'ctr: {ctr}')
+            # Sometimes the api gets hung up resuting in KeyError
+            # In those cases return an error message
+            print(f'were the coordinates good? {coordinates}')
+            time.sleep(2)
+            construct_matplotlib_chart(coordinates, ctr)
+        else:
+            st.write('There was an error contacting the weather.gov server and it timed out, please click the map again.\nThanks!')
 
 def main():
-    st.write("Click anywhere on the map to get it's projected hourly forecast")
-    st.write('- Currently limited to the US')
+    ctr = 0
+    st.write("Clicking on the map below will return a chart representing the locations hourly forecast. \n It's retrieving that information from weather.gov's API and is limited to the US at the moment.")
+    st.write('- As this is just proof of concept the layout is an afterthough and some font is mismatched')
 
     if 'coordinates' not in st.session_state:
         st.session_state['coordinates'] = (40.823740, -77.862548)
@@ -78,13 +69,13 @@ def main():
     map = folium.Map(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]], zoom_start=4, scrollWheelZoom=False, tiles='CartoDB positron')
     if 'themap' not in st.session_state:
         st.session_state.themap = st_folium(map, key='init', height=0)
+
     st.session_state.fg = folium.FeatureGroup(name = 'dots')
     st.session_state.fg.add_child(
         folium.CircleMarker(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]],
                             radius=2,
                             weight=5)
-        )
-    st.session_state.fg.add_child(
+        ).add_child(
         folium.CircleMarker(location=[map.location[0],map.location[1]],
                             radius=8,
                             weight=2)
@@ -97,24 +88,24 @@ def main():
                 folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
                                     radius=1.75,
                                     weight=5)
-                )
-
-            st.session_state.fg.add_child(
+                ).add_child(
                 folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
                                     radius=8,
                                     weight=2)
                 )
     except TypeError:
-        print(st.session_state.themap['last_clicked']['lat'])
+        print(f"themap: {st.session_state.themap['last_clicked']['lat']}")
         print('came through as None')
-    st.session_state.themap = st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=450)
 
-    st_folium(map,key='old',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=0)
+    st.session_state.themap = st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=450)
+    st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=0)
+
     try:
         coords = [st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']]
     except TypeError:
         coords = st.session_state['coordinates']
-    construct_matplotlib_chart(coords)
+    construct_matplotlib_chart(coords, ctr)
+    print("it ran")
 
 if __name__ == '__main__':
     main()
