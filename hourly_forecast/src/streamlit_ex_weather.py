@@ -8,14 +8,6 @@ import time
 from weather import get_cell as cell, get_forecast as get_f
 
 
-# Need to retructure the main function splitting out the two below
-# def create_map(coordinates):
-    # pass
-
-# def clicked_spot(map,coordinates):
-    # pass
-    
-
 def get_f15(y,x):
     # retrieve the grid values from the custom weather module
     the_cell = cell(y,x)
@@ -28,7 +20,6 @@ def get_f15(y,x):
 
 def construct_matplotlib_chart(coordinates, ctr):
     try:
-
         plt.pyplot.grid(True)
         forecast = get_f15(coordinates[0],coordinates[1])
 
@@ -45,14 +36,11 @@ def construct_matplotlib_chart(coordinates, ctr):
         rfdates = plt.dates.DateFormatter('%a')
         ax.xaxis.set_major_formatter(rfdates)
         st.pyplot(fig)
-        print(f'goodcoords: {coordinates}')
     except KeyError as e:
         ctr += 1
         if ctr < 4:
-            print(f'ctr: {ctr}')
             # Sometimes the api gets hung up resuting in KeyError
             # In those cases return an error message
-            print(f'were the coordinates good? {coordinates}')
             time.sleep(2)
             construct_matplotlib_chart(coordinates, ctr)
         else:
@@ -61,7 +49,7 @@ def construct_matplotlib_chart(coordinates, ctr):
 def main():
     ctr = 0
     st.write("Clicking on the map below will return a chart representing the locations hourly forecast. \n It's retrieving that information from weather.gov's API and is limited to the US at the moment.")
-    st.write('- As this is just proof of concept the layout is an afterthough and some font is mismatched')
+    st.write('- As this is just proof of concept the layout is an afterthough and the streamlit_folium package can be a bit tempermental')
 
     if 'coordinates' not in st.session_state:
         st.session_state['coordinates'] = (40.823740, -77.862548)
@@ -105,7 +93,6 @@ def main():
     except TypeError:
         coords = st.session_state['coordinates']
     construct_matplotlib_chart(coords, ctr)
-    print("it ran")
 
 if __name__ == '__main__':
     main()
