@@ -49,7 +49,7 @@ def construct_matplotlib_chart(coordinates, ctr):
 def main():
     ctr = 0
     st.write("Clicking on the map below will return a chart representing the locations hourly forecast for the next week. \n It's retrieving that information from weather.gov's API and is limited to the US at the moment.")
-    st.write('- As this is just proof of concept the layout is an afterthough and the streamlit_folium package can be a bit tempermental')
+    st.write('- While the chart has been custom styled with matplotlib, the layout and fonts are an afterthough at the moment as this is just proof of concept')
     col1, col2 = st.columns(2)
 
     with col1:
