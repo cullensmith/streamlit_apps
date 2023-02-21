@@ -48,51 +48,54 @@ def construct_matplotlib_chart(coordinates, ctr):
 
 def main():
     ctr = 0
-    st.write("Clicking on the map below will return a chart representing the locations hourly forecast. \n It's retrieving that information from weather.gov's API and is limited to the US at the moment.")
+    st.write("Clicking on the map below will return a chart representing the locations hourly forecast for the next week. \n It's retrieving that information from weather.gov's API and is limited to the US at the moment.")
     st.write('- As this is just proof of concept the layout is an afterthough and the streamlit_folium package can be a bit tempermental')
+    col1, col2 = st.columns(2)
 
-    if 'coordinates' not in st.session_state:
-        st.session_state['coordinates'] = (40.823740, -77.862548)
+    with col1:
+        if 'coordinates' not in st.session_state:
+            st.session_state['coordinates'] = (40.823740, -77.862548)
 
-    map = folium.Map(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]], zoom_start=4, scrollWheelZoom=False, tiles='CartoDB positron')
-    if 'themap' not in st.session_state:
-        st.session_state.themap = st_folium(map, key='init', height=0)
+        map = folium.Map(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]], zoom_start=4, scrollWheelZoom=False, tiles='CartoDB positron')
+        if 'themap' not in st.session_state:
+            st.session_state.themap = st_folium(map, key='init', height=0)
 
-    st.session_state.fg = folium.FeatureGroup(name = 'dots')
-    st.session_state.fg.add_child(
-        folium.CircleMarker(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]],
-                            radius=2,
-                            weight=5)
-        ).add_child(
-        folium.CircleMarker(location=[map.location[0],map.location[1]],
-                            radius=8,
-                            weight=2)
-        )
+        st.session_state.fg = folium.FeatureGroup(name = 'dots')
+        st.session_state.fg.add_child(
+            folium.CircleMarker(location=[st.session_state.coordinates[0],st.session_state.coordinates[1]],
+                                radius=2,
+                                weight=5)
+            ).add_child(
+            folium.CircleMarker(location=[map.location[0],map.location[1]],
+                                radius=8,
+                                weight=2)
+            )
 
-    try:
-        if st.session_state.themap['last_clicked']:
-            st.session_state.fg = folium.FeatureGroup(name = 'newdots')
-            st.session_state.fg.add_child(
-                folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
-                                    radius=1.75,
-                                    weight=5)
-                ).add_child(
-                folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
-                                    radius=8,
-                                    weight=2)
-                )
-    except TypeError:
-        print(f"themap: {st.session_state.themap['last_clicked']['lat']}")
-        print('came through as None')
+        try:
+            if st.session_state.themap['last_clicked']:
+                st.session_state.fg = folium.FeatureGroup(name = 'newdots')
+                st.session_state.fg.add_child(
+                    folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
+                                        radius=1.75,
+                                        weight=5)
+                    ).add_child(
+                    folium.CircleMarker(location=[st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']],
+                                        radius=8,
+                                        weight=2)
+                    )
+        except TypeError:
+            print(f"themap: {st.session_state.themap['last_clicked']['lat']}")
+            print('came through as None')
 
-    st.session_state.themap = st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=450)
-    st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=0)
+        st.session_state.themap = st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=450)
+        st_folium(map,key='new',feature_group_to_add=st.session_state.fg, center=st.session_state.themap['last_clicked'], height=0)
 
-    try:
-        coords = [st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']]
-    except TypeError:
-        coords = st.session_state['coordinates']
-    construct_matplotlib_chart(coords, ctr)
+        try:
+            coords = [st.session_state.themap['last_clicked']['lat'],st.session_state.themap['last_clicked']['lng']]
+        except TypeError:
+            coords = st.session_state['coordinates']
+    with col2:
+        construct_matplotlib_chart(coords, ctr)
 
 if __name__ == '__main__':
     main()

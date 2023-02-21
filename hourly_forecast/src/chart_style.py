@@ -4,7 +4,7 @@ def set_style(fig):
     plt.pyplot.grid(True)
     plt.pyplot.rcParams.update({'grid.color': '#eeeeee'})
     # plt.pyplot.rcParams.update({'font.family': 'sans=serif'})
-    plt.pyplot.rcParams.update({'font.size': 8})
+    plt.pyplot.rcParams.update({'font.size': 14})
     plt.pyplot.rcParams.update({'axes.labelcolor': 'red'})
     plt.pyplot.rcParams.update({'axes.edgecolor': '#b4b4b4'})
     plt.pyplot.rcParams.update({'axes.titlecolor': 'yellow'})
