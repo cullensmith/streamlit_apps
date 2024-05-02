@@ -3,7 +3,7 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 import matplotlib.pyplot as plt
-#import matplotlib as plt
+import matplotlib as mplt
 import chart_style
 import time
 from weather import get_cell as cell, get_forecast as get_f
@@ -34,7 +34,7 @@ def construct_matplotlib_chart(coordinates, ctr):
         read_temp = forecast[forecast.startTime == temp]['number'].iloc[0]
         ax.plot(forecast['temperature'][:read_temp], linewidth=2, color='#ff7b7b', zorder=2)
         ax.scatter(forecast[forecast.startTime == temp]['startTime'].iloc[0], forecast[forecast.startTime == temp]['temperature'].iloc[0],color='#ff6b6b', zorder=3)
-        rfdates = plt.dates.DateFormatter('%a')
+        rfdates = mplt.dates.DateFormatter('%a')
         ax.xaxis.set_major_formatter(rfdates)
         st.pyplot(fig)
     except KeyError as e:
