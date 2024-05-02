@@ -2,7 +2,8 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-import matplotlib as plt
+import matplotlib.pyplot as plt
+#import matplotlib as plt
 import chart_style
 import time
 from weather import get_cell as cell, get_forecast as get_f
@@ -20,10 +21,10 @@ def get_f15(y,x):
 
 def construct_matplotlib_chart(coordinates, ctr):
     try:
-        plt.pyplot.grid(True)
+        plt.grid(True)
         forecast = get_f15(coordinates[0],coordinates[1])
 
-        fig, ax = plt.pyplot.subplots()
+        fig, ax = plt.subplots()
         chart_style.set_style(fig)
 
         temp = st.select_slider(label='Drag the slider to target a specific time:',options=forecast['startTime'], format_func=lambda x: x.strftime('%A %b %d: %I%p') )
